@@ -1,0 +1,12 @@
+body {
+	background-image: url("../images/bright_squares_@2X.png");
+}
+
+header {
+	text-align: center;
+}
+
+.input-field label {
+	font-size: 90%;
+}
+
