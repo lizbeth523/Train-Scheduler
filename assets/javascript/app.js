@@ -48,41 +48,33 @@ $(document).ready( function() {
 	});
 
 	database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-		console.log(childSnapshot.val());
+		// console.log(childSnapshot.val());
 
 		// Get train info from the database and store in variables
 	  	var trainName = childSnapshot.val().name;
 	  	var destination = childSnapshot.val().destination;
 	  	var nextArrival = childSnapshot.val().start;
 	  	var frequency = childSnapshot.val().frequency;
+	  	// Get the hours and minutes for the start time
+	  	var startTimeArray = nextArrival.split(":");
+	  
+	  	// console.log(moment().hour(startTimeArray[0]).minute(startTimeArray[1]).format());
 
-	  	// Calculate next arrival time
-	  	var date = Date();
-	  	date = date.substr(4, 11);
-	  	var nextArrival = moment(date + " " + nextArrival, "MMM DD YYYY HH:mm");
+	  	// Set the next arrival to the current day at the start time
+	  	nextArrival = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).format("ddd MMM DD YYYY HH:mm");
+	  	// If the current time is after the start time, then set the next arrival to the next day at the start time
+	  	if (moment().isAfter(nextArrival)) {
+	  		nextArrival = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).add(1, 'day').format("ddd MMM DD YYYY HH:mm");
+	  	}
+
+	  	console.log(nextArrival.unix());
 	  	
-	  	var now = moment().format("ddd MMM DD YYYY HH:mm");
-	  	console.log("now " + now);
-	  	// while (now.isBefore(nextArrival)) {
-	  	// 	var x = 2;
-	  	// 	// nextArrivalMoment = nextArrivalMoment.add(frequency, 'minutes');
-	  	// }
-
-
-	  	// Calculate minutes away
-	  	// var nextArrival = startMoment.add();
-
-	  	console.log(trainName);
-	    console.log(destination);
-	    console.log(frequency);
-	    console.log(nextArrival.format("ddd MMM DD YYYY HH:mm"));
-
 	  	// Create a new row to add to the schedule table
 	  	var newRow = $("<tr>");
 	  	newRow.append("<td>" + trainName + "</td>");
 	  	newRow.append("<td>" + destination + "</td>");
 	  	newRow.append("<td>" + frequency + "</td>");
-	  	newRow.append("<td>" + nextArrival.format("ddd MMM DD YYYY HH:mm") + "</td>");
+	  	newRow.append("<td>" + nextArrival + "</td>");
 	  	newRow.append("<td>Minutes Away</td>");
 
 	  	// Add the row to the table
