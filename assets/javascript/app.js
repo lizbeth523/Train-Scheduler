@@ -15,7 +15,7 @@ $(document).ready( function() {
 	$("#btn-submit").on("click", function() {
 	  	event.preventDefault();
 
-	  	// Store info about the train that was input on the form into variables
+	  	// Store info about the train into variables
 	  	var trainName = $("#train_name").val().trim();
 	  	var destination = $("#destination").val().trim();
 	  	var startTime = $("#train-time").val().trim();
@@ -37,23 +37,55 @@ $(document).ready( function() {
 		  		frequency: frequency
 		  	};
 
-		  	Upload new train to the database
-		  	database.ref().push(newTrain);
+		  	// Upload new train to the database
+		  	// database.ref().push(newTrain);
+
+		  	alert(true);
 	  	}
 	  	else {
 	  		alert(false);
-	  	}
-
-	  	
-
-	  	console.log(trainName);
-	  	console.log(destination);
-	  	console.log(startTime);
-	  	console.log(frequency);
-	  	
+	  	}	  	
 	});
 
 	database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-	  	var x=2;
+		console.log(childSnapshot.val());
+
+		// Get train info from the database and store in variables
+	  	var trainName = childSnapshot.val().name;
+	  	var destination = childSnapshot.val().destination;
+	  	var nextArrival = childSnapshot.val().start;
+	  	var frequency = childSnapshot.val().frequency;
+
+	  	// Calculate next arrival time
+	  	var date = Date();
+	  	date = date.substr(4, 11);
+	  	var nextArrival = moment(date + " " + nextArrival, "MMM DD YYYY HH:mm");
+	  	
+	  	var now = moment().format("ddd MMM DD YYYY HH:mm");
+	  	console.log("now " + now);
+	  	// while (now.isBefore(nextArrival)) {
+	  	// 	var x = 2;
+	  	// 	// nextArrivalMoment = nextArrivalMoment.add(frequency, 'minutes');
+	  	// }
+
+
+	  	// Calculate minutes away
+	  	// var nextArrival = startMoment.add();
+
+	  	console.log(trainName);
+	    console.log(destination);
+	    console.log(frequency);
+	    console.log(nextArrival.format("ddd MMM DD YYYY HH:mm"));
+
+	  	// Create a new row to add to the schedule table
+	  	var newRow = $("<tr>");
+	  	newRow.append("<td>" + trainName + "</td>");
+	  	newRow.append("<td>" + destination + "</td>");
+	  	newRow.append("<td>" + frequency + "</td>");
+	  	newRow.append("<td>" + nextArrival.format("ddd MMM DD YYYY HH:mm") + "</td>");
+	  	newRow.append("<td>Minutes Away</td>");
+
+	  	// Add the row to the table
+	  	$("#schedule-table").append(newRow);
 	});
 });
