@@ -50,32 +50,36 @@ $(document).ready( function() {
 	database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 		// console.log(childSnapshot.val());
 
-		// Get train info from the database and store in variables
 	  	var trainName = childSnapshot.val().name;
 	  	var destination = childSnapshot.val().destination;
 	  	var nextArrival = childSnapshot.val().start;
 	  	var frequency = childSnapshot.val().frequency;
 	  	// Get the hours and minutes for the start time
 	  	var startTimeArray = nextArrival.split(":");
-	  
+	  	var minutesAway;
+
 	  	// console.log(moment().hour(startTimeArray[0]).minute(startTimeArray[1]).format());
 
 	  	// Set the next arrival to the current day at the start time
 	  	nextArrival = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).format("ddd MMM DD YYYY HH:mm");
+	  	// Set minutesAway to the time difference in  minutes between the next arrival time and now
+	  	minutesAway = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).diff(moment(), 'minutes');
+
 	  	// If the current time is after the start time, then set the next arrival to the next day at the start time
 	  	if (moment().isAfter(nextArrival)) {
 	  		nextArrival = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).add(1, 'day').format("ddd MMM DD YYYY HH:mm");
+	  		// Set minutesAway to the time difference in  minutes between the next arrival time and now
+	  		minutesAway = moment().hour(startTimeArray[0]).minute(startTimeArray[1]).add(1, 'day').diff(moment(), 'minutes');
 	  	}
+	  		 
 
-	  	console.log(nextArrival.unix());
-	  	
 	  	// Create a new row to add to the schedule table
 	  	var newRow = $("<tr>");
 	  	newRow.append("<td>" + trainName + "</td>");
 	  	newRow.append("<td>" + destination + "</td>");
 	  	newRow.append("<td>" + frequency + "</td>");
 	  	newRow.append("<td>" + nextArrival + "</td>");
-	  	newRow.append("<td>Minutes Away</td>");
+	  	newRow.append("<td>" + minutesAway + "</td>");
 
 	  	// Add the row to the table
 	  	$("#schedule-table").append(newRow);
